@@ -3,12 +3,12 @@ default-lang = "en"
 [en]
 title = "A simple linguify example"
 abstract = "Abstract"
-test = "Test"
+test = "testing"
 
 [de]
 title = "Ein einfaches Linguify Beispiel"
 abstract = "Zusammenfassung"
-test = "gut"
+test = "testen"
 
 [es]
 title = "Un ejemplo sencillo de linguify"

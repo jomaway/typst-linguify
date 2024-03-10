@@ -5,14 +5,14 @@ Load strings for different languages easily. This can be useful if you create a 
 ## Usage
 
 ```typst
-#import "@local/linguify:0.1.0": *
+#import "@preview/linguify:0.2.0": *
 
 #let lang_data = toml("lang.toml")
+#show: linguify_config.with(data: lang_data);
 
-#show: linguify_config.with(data: lang_data, lang: "en");
+#set text(lang: "de")
 
-#linguify(abstract)  // Shows Abstract in the document.
-
+#linguify(abstract)  // Shows "Zusammenfassung" in the document.
 ```
 
 The `lang.toml` musst look like this:
