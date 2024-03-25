@@ -78,6 +78,22 @@
   }
 }
 
+/// Update args
+#let linguify_update_args(args) = {
+  context {
+    if linguify_is_database_initialized() {
+      let database = __linguify_lang_database.get()
+      let new-args = database.at("args", default: (:))
+      for (key, value) in args.pairs() {
+        new-args.insert(key, value)
+      }
+      linguify_add_to_database(("args": new-args))
+    } else {
+      panic("linguify database not initialized.")
+    }
+  }
+}
+
 /// set a fallback language
 #let linguify_set_fallback_lang(lang) = {
   if lang != auto and lang != none {
@@ -128,7 +144,7 @@
 /// - from (dictionary): database to fetch the item from. If auto linguify's global database will used.
 /// - lang (string): the language to look for, if auto use `context text.lang` (default)
 /// - default (any): A default value to return if the key is not part of the database.
-#let linguify(key, from: auto, lang: auto, default: auto) = {
+#let linguify(key, from: auto, lang: auto, default: auto, args: auto) = {
   context {
     let database = if-auto-then(from,__linguify_lang_database.get())
 
@@ -139,6 +155,9 @@
     let lang_not_found = not selected_lang in database
     let fallback_lang = if-auto-then(__linguify_lang_fallback.get(), database.at("default-lang", default: none) )
 
+    // get args
+    let args = if-auto-then(args, database.at("args", default: (:)))
+
     // if available get the language section from the database if not try to get the fallback_lang entry.
     let lang_section = database.at(
       selected_lang,
@@ -148,7 +167,7 @@
     // if lang_entry exists 
     if ( lang_section != none ) {
       // check if the value exits.
-      let value = get_text(lang_section, key, default: none)
+      let value = get_text(lang_section, key, default: none, args: args)
       if (value == none) {
         // info: fallback lang will not be used if given lang section exists but only a key is missing.
         // use this for a workaround: linguify("key", default: linguify("key", lang: "en", default: "key"));
@@ -158,8 +177,7 @@
 
           let fallback_lang_section = database.at(fallback_lang)
           // check if key exists in fallback lang.
-          // TODO: add args here
-          let value = get_text(fallback_lang_section, key, default: none, args: none)
+          let value = get_text(fallback_lang_section, key, default: none, args: args)
           assert(value != none, message: "key (" +  key + ") does not exist in fallback lang section.")
           return value
         }
