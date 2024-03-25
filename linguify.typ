@@ -1,76 +1,34 @@
 // linguify
 
-#let __linguify_lang_preferred = state("linguify-preferred-lang", auto);  // auto means detect from context text.lang 
-#let __linguify_lang_database = state("linguify-database", none);  // none or dictionary 
-#let __linguify_lang_fallback = state("linguify-fallback-lang", auto); // auto means to look in database.
+/// None or dictionary of the following structure:
+/// default-lang: "en"
+/// en: *en-data*
+/// de: *de-data*
+/// ...
+#let database = state("linguify-database", none);
 
-/// wrapper to get linguify database
-/// ! needs context
-#let linguify_get_database() = {
-  __linguify_lang_database.get()
-}
 
-/// set a data dictionary for linguify database
-#let linguify_set_database(data) = {
+/// set the default linguify database
+#let set_database(data) = {
   assert.eq(type(data), dictionary, message: "expected data to be a dictionary, found " + type(data))
-  __linguify_lang_database.update(data);
-}
-
-/// check if database is not empty
-/// ! needs context 
-#let linguify_is_database_initialized() = {
-  __linguify_lang_database.get() != none
+  database.update(data);
 }
 
 /// add data to the current database
-#let linguify_add_to_database(data) = {
+#let update_database(data) = {
   context {
-    let database = __linguify_lang_database.get()
+    let _database = database.get()
     for (key,value) in data.pairs() {
       // let lang_section = database.at(key, default: none)
-      if key not in database.keys() {
-        database.insert(key, value)
+      if key not in _database.keys() {
+        _database.insert(key, value)
       } else {
-        let new = database.at(key) + value
-        database.insert(key, new)
+        let new = _database.at(key) + value
+        _database.insert(key, new)
       }
     }
-    __linguify_lang_database.update(database);
+    database.update(_database);
   }
-}
-
-/// set a fallback language
-#let linguify_set_fallback_lang(lang) = {
-  if lang != auto and lang != none {
-    assert.eq(type(lang), str, message: "expected fallback lang to be a string, found " + type(lang))
-  }
-  __linguify_lang_fallback.update(lang)
-}
-
-/// set a preferred language.
-///
-/// ! warning: language from `set text(lang: "de")` is not detected if this is used.
-/// you probably want this to stay auto
-#let linguify_set_preferred_lang(lang) = {
-  if lang != auto {
-    assert.eq(type(lang), str, message: "expected overwrite lang to be a string, found " + type(lang))
-  }
-  __linguify_lang_preferred.update(lang);
-}
-
-/// update all settings at once
-#let linguify_config(data: auto, lang: auto, fallback: auto) = {
-  // set language data dictionary
-  if data != auto {
-    linguify_set_data(data)
-  }
-
-  // set fallback mode.
-  linguify_set_fallback_lang(fallback)
-
-  /// ! warning: language from `set text(lang: "de")` is not detected if this is used.
-  /// you probably want this to stay auto
-  linguify_set_preferred_lang(lang)
 }
 
 /// Helper function. 
@@ -89,16 +47,17 @@
 /// - from (dictionary): database to fetch the item from. If auto linguify's global database will used.
 /// - lang (string): the language to look for, if auto use `context text.lang` (default)
 /// - default (any): A default value to return if the key is not part of the database.
+/// -> content
 #let linguify(key, from: auto, lang: auto, default: auto) = {
   context {
-    let database = if-auto-then(from,__linguify_lang_database.get())
+    let database = if-auto-then(from,database.get())
 
     // check if database is not empty. Means no data dictionary was specified.
     assert(database != none, message: "linguify database is empty.")
     // get selected language.
-    let selected_lang = if-auto-then(lang, if-auto-then(__linguify_lang_preferred.get(), text.lang))
+    let selected_lang = if-auto-then(lang, text.lang)
     let lang_not_found = not selected_lang in database
-    let fallback_lang = if-auto-then(__linguify_lang_fallback.get(), database.at("default-lang", default: none) )
+    let fallback_lang = database.at("default-lang", default: none)
 
     // if available get the language section from the database if not try to get the fallback_lang entry.
     let lang_section = database.at(
