@@ -2,10 +2,19 @@
 
 Load strings for different languages easily. This can be useful if you create a package or template for multilingual usage. See the [gentle-clues package](https://github.com/jomaway/typst-gentle-clues) as an example.
 
+⚠️ **Version 0.3.1 is not merged as official package yet.**
+
 ## Usage
 
+The usage depends if you are using it inside a package or a template or in your own document.
+
+### For end users and own templates
+
+You can use linguify global database.
+
+Example:
 ```typst
-#import "@preview/linguify:0.3.0": *
+#import "@preview/linguify:0.3.1": *
 
 #let lang_data = toml("lang.toml")
 #linguify_set_database(lang_data);
@@ -27,6 +36,21 @@ abstract = "Abstract"
 [de]
 title = "Ein einfaches Linguify Beispiel"
 abstract = "Zusammenfassung"
+```
+
+### Inside a package
+
+So that multiple packages can use linguify simultaneously, they should contain their own database. A linguify database is just a dictionary with a certain structure. (See database structure.)
+
+Recommend is to store the database in a separate file like `lang.toml` and load it inside the document. And specify it in each `linguify()` function call.
+
+Example: 
+```typ
+#import "@preview/linguify:0.3.1": *
+
+#let database = toml("lang.toml")
+
+#linguify("key", from: database, default: "key")
 ```
 
 ## Features
