@@ -27,7 +27,13 @@
   context {
     let database = __linguify_lang_database.get()
     for (key,value) in data.pairs() {
-      database.insert(key, value)
+      // let lang_section = database.at(key, default: none)
+      if key not in database.keys() {
+        database.insert(key, value)
+      } else {
+        let new = database.at(key) + value
+        database.insert(key, new)
+      }
     }
     __linguify_lang_database.update(database);
   }
@@ -77,10 +83,16 @@
   }
 }
 
-/// fetch the string in the required lang.
-#let linguify(key, default: auto, lang: auto) = {
+/// fetch a string in the required lang.
+///
+/// - key (string): The key at which to retrieve the item.
+/// - from (dictionary): database to fetch the item from. If auto linguify's global database will used.
+/// - lang (string): the language to look for, if auto use `context text.lang` (default)
+/// - default (any): A default value to return if the key is not part of the database.
+#let linguify(key, from: auto, lang: auto, default: auto) = {
   context {
-    let database = __linguify_lang_database.get()
+    let database = if-auto-then(from,__linguify_lang_database.get())
+
     // check if database is not empty. Means no data dictionary was specified.
     assert(database != none, message: "linguify database is empty.")
     // get selected language.
