@@ -1,7 +1,42 @@
 // linguify
 
+#import "fluent.typ": get_message as __get_ftl_message, has_message as __has_ftl_message, ftl_data
+
 #let __linguify_lang_preferred = state("linguify-preferred-lang", auto);  // auto means detect from context text.lang 
-#let __linguify_lang_database = state("linguify-database", none);  // none or dictionary 
+
+/// None or dictionary of the following structure:
+/// default-lang: "en"
+/// en: *en-data*
+/// de: *de-data*
+/// ...
+/// where *en-data* and *de-data* are in the following structure:
+/// __type: "typst-dict" | "ftl"
+/// data: *typst-dict* | *ftl-str*
+#let __linguify_lang_database = state("linguify-database", none);
+
+/// Get a value from a L10n data dictionary.
+#let get_text(src, key, default: none, args: none) = {
+  assert.eq(type(src), dictionary, message: "expected src to be a dictionary, found " + type(src))
+  if not "__type" in src {
+    // Assume it's a typst-dict.
+    src.at(key, default: default)
+  }
+  if src.__type == "typst-dict" {
+    src.data.at(key, default: default)
+  } else if src.__type == "ftl" {
+    let data = src.at("data", default: none)
+    assert(data != none, message: "expected data to be present in ftl-string")
+    assert.eq(type(data), str, message: "expected data to be a string, found " + type(data))
+    if __has_ftl_message(data, key) {
+      __get_ftl_message(data, key, args: args)
+    } else {
+      default
+    }
+  } else {
+    panic("Invalid L10n data type: " + src.type)
+  }
+}
+
 #let __linguify_lang_fallback = state("linguify-fallback-lang", auto); // auto means to look in database.
 
 /// wrapper to get linguify database
@@ -11,7 +46,11 @@
 }
 
 /// set a data dictionary for linguify database
-#let linguify_set_database(data) = {
+#let linguify_set_database(data, languages: ()) = {
+  if type(data) == str {
+    // Interpret as FTL root
+    data = ftl_data(data, languages) 
+  }
   assert.eq(type(data), dictionary, message: "expected data to be a dictionary, found " + type(data))
   __linguify_lang_database.update(data);
 }
@@ -62,7 +101,7 @@
 #let linguify_config(data: auto, lang: auto, fallback: auto) = {
   // set language data dictionary
   if data != auto {
-    linguify_set_data(data)
+    linguify_set_database(data)
   }
 
   // set fallback mode.
@@ -109,16 +148,20 @@
     // if lang_entry exists 
     if ( lang_section != none ) {
       // check if the value exits.
-      let value = lang_section.at(key, default: none)
+      let value = get_text(lang_section, key, default: none)
       if (value == none) {
         // info: fallback lang will not be used if given lang section exists but only a key is missing.
         // use this for a workaround: linguify("key", default: linguify("key", lang: "en", default: "key"));
         if (fallback_lang != none) {
           // check if fallback lang exists in database
           assert(database.at(fallback_lang, default: none) != none, message: "fallback lang (" + fallback_lang + ") does not exist in linguify database")
+
+          let fallback_lang_section = database.at(fallback_lang)
           // check if key exists in fallback lang.
-          assert(database.at(fallback_lang).at(key, default: none) != none, message: "key (" +  key + ") does not exist in fallback lang section.")
-          return database.at(fallback_lang).at(key)
+          // TODO: add args here
+          let value = get_text(fallback_lang_section, key, default: none, args: none)
+          assert(value != none, message: "key (" +  key + ") does not exist in fallback lang section.")
+          return value
         }
         if (default != auto) {
           return default
