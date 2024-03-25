@@ -21,7 +21,7 @@
     // Assume it's a typst-dict.
     src.at(key, default: default)
   }
-  if src.__type == "typst-dict" {
+  else if src.__type == "typst-dict" {
     src.data.at(key, default: default)
   } else if src.__type == "ftl" {
     let data = src.at("data", default: none)
