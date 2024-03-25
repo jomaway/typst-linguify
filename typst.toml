@@ -1,6 +1,6 @@
 [package]
 name = "linguify"
-version = "0.2.0"
+version = "0.3.0"
 entrypoint = "linguify.typ"
 authors = ["Jomaway <https://github.com/jomaway>"]
 license = "MIT"

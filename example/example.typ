@@ -1,15 +1,16 @@
-#import "@preview/linguify:0.2.0": *
+#import "@local/linguify:0.3.0": *
 
 #show raw.where(block: false): it => {
   box(fill: luma(240), radius: 5pt, inset: 3pt, it)
 }
-#show: linguify_config.with(data: toml("lang.toml"), fallback: false);
+
+#linguify_set_database(toml("lang.toml"))
 
 = Linguify
 
 #v(1em)
 *Load language data file:* \
-`#show: linguify_config.with(data: toml("lang.toml"), fallback: true);`
+`#show: linguify_config.with(data: toml("lang.toml"));`
 #v(1em)
 
 #smallcaps(linguify("abstract"))
@@ -31,7 +32,6 @@
 `#set text(lang: "es")`
 
 #set text(lang: "es") // as not all values for the spanish language are translated yet we set fallback to true to suppress errors.
-#show: linguify_config.with(fallback: true);
 
 #smallcaps(linguify("abstract"))
 == #linguify("title") 
