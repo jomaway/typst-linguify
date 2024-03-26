@@ -1,20 +1,21 @@
+[conf]
 default-lang = "en"
 
-[en]
+[lang.en]
 title = "A simple linguify example"
 abstract = "Abstract"
 test = "testing"
 
-[de]
+[lang.de]
 title = "Ein einfaches Linguify Beispiel"
 abstract = "Zusammenfassung"
 test = "testen"
 
-[es]
+[lang.es]
 title = "Un ejemplo sencillo de linguify"
 abstract = "Resumen"
 
-[fr]
+[lang.fr]
 title = "Un exemple simple de linguify"
 abstract = "résumé"
 
