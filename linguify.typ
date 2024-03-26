@@ -1,20 +1,35 @@
 // linguify
 
 /// None or dictionary of the following structure:
-/// default-lang: "en"
-/// en: *en-data*
-/// de: *de-data*
-/// ...
+///
+/// ```
+/// conf.default-lang: "en"
+/// lang.en:  *en-data*
+/// lang.de: *de-data*
+/// ```
 #let database = state("linguify-database", none);
 
 
-/// set the default linguify database
+/// Set the default linguify database
+///
+/// The data must contain at least a lang section like described at @@database.
+///
+/// - data (dictionary): the database which will be set to @@database
+/// -> content (state-update)
 #let set_database(data) = {
   assert.eq(type(data), dictionary, message: "expected data to be a dictionary, found " + type(data))
+  if (data.at("conf", default: none) == none) {
+    data.insert("conf", (:))
+  }
+  // assert(data.at("conf", default: none) != none, message: "missing conf section ")
+  assert(data.at("lang", default: none) != none, message: "missing lang section ")
   database.update(data);
 }
 
-/// add data to the current database
+/// Add data to the current database
+///
+/// - data (dictionary): the database which will be set to @@database
+/// -> content (state-update)
 #let update_database(data) = {
   context {
     let _database = database.get()
@@ -31,8 +46,8 @@
   }
 }
 
-/// Helper function. 
-/// if the value is auto "ret" is returned else the value self is returned
+// Helper function. 
+// if the value is auto "ret" is returned else the value self is returned
 #let if-auto-then(val,ret) = {
   if (val == auto){
     ret
@@ -56,13 +71,13 @@
     assert(database != none, message: "linguify database is empty.")
     // get selected language.
     let selected_lang = if-auto-then(lang, text.lang)
-    let lang_not_found = not selected_lang in database
-    let fallback_lang = database.at("default-lang", default: none)
+    let lang_not_found = not selected_lang in database.lang
+    let fallback_lang = database.conf.at("default-lang", default: none)
 
     // if available get the language section from the database if not try to get the fallback_lang entry.
-    let lang_section = database.at(
+    let lang_section = database.lang.at(
       selected_lang,
-      default: if (fallback_lang != none) { database.at(fallback_lang, default: none) } else { none }
+      default: if (fallback_lang != none) { database.lang.at(fallback_lang, default: none) } else { none }
     )
 
     // if lang_entry exists 
@@ -74,10 +89,10 @@
         // use this for a workaround: linguify("key", default: linguify("key", lang: "en", default: "key"));
         if (fallback_lang != none) {
           // check if fallback lang exists in database
-          assert(database.at(fallback_lang, default: none) != none, message: "fallback lang (" + fallback_lang + ") does not exist in linguify database")
+          assert(database.lang.at(fallback_lang, default: none) != none, message: "fallback lang (" + fallback_lang + ") does not exist in linguify database")
           // check if key exists in fallback lang.
-          assert(database.at(fallback_lang).at(key, default: none) != none, message: "key (" +  key + ") does not exist in fallback lang section.")
-          return database.at(fallback_lang).at(key)
+          assert(database.lang.at(fallback_lang).at(key, default: none) != none, message: "key (" +  key + ") does not exist in fallback lang section.")
+          return database.lang.at(fallback_lang).at(key)
         }
         if (default != auto) {
           return default
