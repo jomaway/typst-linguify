@@ -1,5 +1,7 @@
 // linguify
 
+#import "fluent.typ": ftl_data, get_message as __get_message
+
 /// None or dictionary of the following structure:
 ///
 /// ```
@@ -62,11 +64,16 @@
 /// - lang (str): The language to get the value for.
 /// - mode (str): The data structure of src, currently only "dict" is supported.
 /// -> The value for the key in the dictionary. If the key does not exist, `none` is returned.
-#let get_text(src, key, lang, mode: "dict") = {
+#let get_text(src, key, lang, mode: "dict", args: none) = {
   assert.eq(type(src), dictionary, message: "expected src to be a dictionary, found " + type(src))
   let lang_section = src.at(lang, default: none)
   if (lang_section != none) {
-    return lang_section.at(key, default: none)
+    if mode == "dict" {
+      return lang_section.at(key, default: none)
+    }
+    else if mode == "ftl" {
+      return __get_message(lang_section, key, args: args)
+    }
   }
   return none
 }
@@ -78,9 +85,11 @@
 /// - lang (string): the language to look for, if auto use `context text.lang` (default)
 /// - default (any): A default value to return if the key is not part of the database.
 /// -> content
-#let linguify(key, from: auto, lang: auto, default: auto) = {
+#let linguify(key, from: auto, lang: auto, default: auto, args: auto) = {
   context {
     let database = if-auto-then(from,database.get())
+
+    let data_type = database.conf.at("data_type", default: "dict")
 
     // check if database is not empty. Means no data dictionary was specified.
     assert(database != none, message: "linguify database is empty.")
@@ -89,7 +98,9 @@
     let lang_not_found = not selected_lang in database.lang
     let fallback_lang = database.conf.at("default-lang", default: none)
 
-    let value = get_text(database.lang, key, selected_lang)
+    let args = if-auto-then(args, (:))
+
+    let value = get_text(database.lang, key, selected_lang, mode: data_type, args: args)
     
     if (value != none) {
       return value
@@ -97,7 +108,7 @@
     
     // Check if a fallback language is set
     if (fallback_lang != none) {
-      let value = get_text(database.lang, key, fallback_lang)
+      let value = get_text(database.lang, key, fallback_lang, mode: data_type, args: args)
 
       // Use the fallback language if possible
       if (value != none) {
