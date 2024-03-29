@@ -1,7 +1,6 @@
 // linguify.typ
 #import "utils.typ": *
-
-#import "fluent.typ": load_ftl_data, get_message as __get_message
+#import "fluent.typ"
 
 /// None or dictionary of the following structure:
 ///
@@ -69,10 +68,10 @@
   let lang_section = src.at(lang, default: none)
   if (lang_section != none) {
     if mode == "dict" {
-    return lang_section.at(key, default: none)
+      return lang_section.at(key, default: none)
     }
     else if mode == "ftl" {
-      return __get_message(lang_section, key, args: args, default: none)
+      return fluent.get_message(lang_section, key, args: args, default: none)
     }
     // Support for other i18n solutions can be added here.
   }
