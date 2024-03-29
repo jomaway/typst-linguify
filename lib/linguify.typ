@@ -1,15 +1,18 @@
 // linguify.typ
 #import "utils.typ": *
 
+#import "fluent.typ": load_ftl_data, get_message as __get_message
 
 /// None or dictionary of the following structure:
 ///
-/// ```
-/// conf.default-lang: "en"
-/// lang.en:  *en-data*
-/// lang.de: *de-data*
-/// ```
-#let database = state("linguify-database", none);
+/// - `conf`
+///   - `data_type` (string): The type of data structure used for the database. If not specified, it defaults to `dict` structure.
+///   - `default-lang` (string): The default language to use as a fallback if the key in the preferred language is not found.
+///   - ...
+/// - `lang`
+///   - `en`: The English language section.
+///   - ...
+#let database = state("linguify-database", none)
 
 
 /// Set the default linguify database
@@ -59,13 +62,19 @@
 /// - src (dict): The dictionary to get the value from.
 /// - key (str): The key to get the value for.
 /// - lang (str): The language to get the value for.
-/// - mode (str): The data structure of src, currently only "dict" is supported.
+/// - mode (str): The data structure of src
 /// -> The value for the key in the dictionary. If the key does not exist, `none` is returned.
-#let get_text(src, key, lang, mode: "dict") = {
+#let get_text(src, key, lang, mode: "dict", args: none) = {
   assert.eq(type(src), dictionary, message: "expected src to be a dictionary, found " + type(src))
   let lang_section = src.at(lang, default: none)
   if (lang_section != none) {
+    if mode == "dict" {
     return lang_section.at(key, default: none)
+    }
+    else if mode == "ftl" {
+      return __get_message(lang_section, key, args: args, default: none)
+    }
+    // Support for other i18n solutions can be added here.
   }
   return none
 }
@@ -77,17 +86,21 @@
 /// - lang (string): the language to look for, if auto use `context text.lang` (default)
 /// -> dictionary with ("ok":value) if value was found and ("error": error_message) if value was not found
 
-#let _linguify(key, from: auto, lang: auto) = {
+#let _linguify(key, from: auto, lang: auto, args: auto) = {
   let database = if-auto-then(from,database.get())
+
   // check if database is not empty. Means no data dictionary was specified.
   if (database == none) { return error("linguify database is empty.") }
+  let data_type = database.conf.at("data_type", default: "dict")
 
   // get selected language.
   let selected_lang = if-auto-then(lang, text.lang)
   let lang_not_found = not selected_lang in database.lang
   let fallback_lang = database.conf.at("default-lang", default: none)
 
-  let value = get_text(database.lang, key, selected_lang)
+  let args = if-auto-then(args, (:))
+
+  let value = get_text(database.lang, key, selected_lang, mode: data_type, args: args)
   
   if (value != none) {
     return ok(value)
@@ -95,23 +108,22 @@
   
   // Check if a fallback language is set
   if (fallback_lang != none) {
-    let value = get_text(database.lang, key, fallback_lang)
+      let value = get_text(database.lang, key, fallback_lang, mode: data_type, args: args)
 
-    // Use the fallback language if possible
-    if (value != none) {
-      return ok(value)
+      // Use the fallback language if possible
+      if (value != none) {
+        return ok(value)
     }
-  }
 
-  // if no fallback language is set
-  let error_message = if lang_not_found {
-    "Could not find language `" + selected_lang + "` in the linguify database."
-  } else {
-    "Could not find an entry for the key `" + key + "` in language `" + selected_lang + "` at the linguify database."
-  }
-  if (fallback_lang != none) { 
+    // if the key is not found in the fallback language
+    let error_message = if lang_not_found {
+      "Could not find language `" + selected_lang + "` in the linguify database."
+    } else {
+      "Could not find an entry for the key `" + key + "` in language `" + selected_lang + "` at the linguify database."
+    }
     error_message = error_message + " Also, the fallback language `" + fallback_lang + "` does not contain the key `" + key + "`."
   } else {
+    // if no fallback language is set
     error_message = error_message + " Also, no fallback language is set."
   }
 
@@ -127,9 +139,9 @@
 /// - lang (string): the language to look for, if auto use `context text.lang` (default)
 /// - default (any): A default value to return if the key is not part of the database.
 /// -> content
-#let linguify(key, from: auto, lang: auto, default: auto) = {
+#let linguify(key, from: auto, lang: auto, default: auto, args: (:)) = {
   context {
-    let result = _linguify(key, from: from, lang: lang)
+    let result = _linguify(key, from: from, lang: lang, args: args)
     if is-ok(result) {
       result.ok
     } else {

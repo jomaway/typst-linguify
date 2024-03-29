@@ -111,6 +111,10 @@ This makes sure the end user still can use the global database provided by #l wi
 
 #sym.arrow Have a look at the #link("https://github.com/jomaway/typst-gentle-clues", "gentle-clues") package for a real live example.
 
+== Contributing
+
+If you would like to integrate a new i18n solution into #l, you can set the `conf.data_type` described in the #ref(<db>, supplement: "database section"). And then add implementation in the `get-text` function for your data type.
+
 #pagebreak()
 = Reference
 

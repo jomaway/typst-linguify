@@ -1,5 +1,11 @@
+# Rust bindings for Linguify
+
+lib/linguify_fluent_rs/target/
+
 # Typst
+
 *.pdf
 
 # Mac OS X Finder files
+
 .DS_Store
