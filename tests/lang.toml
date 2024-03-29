@@ -1,0 +1,17 @@
+[conf]
+default-lang = "en"
+
+[lang.en]
+apple = "Apple"
+pear = "Pear"
+banana = "Banana"
+red = "red"
+green = "green"
+yellow = "yellow"
+
+
+[lang.de]
+apple = "Apfel"
+pear = "Birne"
+banana = "Banane"
+
