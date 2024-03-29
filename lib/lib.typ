@@ -1,0 +1,1 @@
+#import "linguify.typ": *
