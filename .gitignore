@@ -1,6 +1,6 @@
 # Rust bindings for Linguify
 
-linguify_fluent_rs/target/
+lib/linguify_fluent_rs/target/
 
 # Typst
 
