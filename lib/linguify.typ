@@ -1,7 +1,7 @@
 // linguify.typ
 #import "utils.typ": *
 
-#import "fluent.typ": ftl_data, get_message as __get_message
+#import "fluent.typ": load_ftl_data, get_message as __get_message
 
 /// None or dictionary of the following structure:
 ///

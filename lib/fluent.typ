@@ -31,9 +31,9 @@
 ///
 /// ## Example:
 /// ```typst
-/// eval(ftl_data("path/to/ftl", ("en", "fr")))
+/// eval(load_ftl_data("path/to/ftl", ("en", "fr")))
 /// ```
-#let ftl_data(
+#let load_ftl_data(
   path,
   languages
 ) = {
