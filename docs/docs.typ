@@ -1,20 +1,20 @@
 #import "@preview/linguify:0.4.0": *
-#import "@preview/gentle-clues:0.7.1": abstract
+#import "@preview/gentle-clues:0.7.1": abstract, quote as _quote
 
-#show raw.where(block: false): it => {
-  box(fill: luma(240), radius: 5pt, inset: (x: 3pt), outset: (y:3pt), it)
-}
 
 #let l = [_linguify_]
 
 #set text(font: "Rubik", weight: 300)
-#set heading(numbering: (..args) => {
-  // let nums = args.pos()
-  // let level = nums.len()
-  // if level == 1 {
-  //   [#numbering("1.", ..nums)]
-  // }
-})
+#set heading(numbering: (..args) => {})  //needed for ref to work
+
+#show raw.where(block: false): it => {
+  box(fill: luma(240), radius: 5pt, inset: (x: 3pt), outset: (y:3pt), it)
+}
+#show link: set text(fill: blue)
+#show quote.where(block: false): it => {
+  ["] + h(0pt, weak: true) + it.body + h(0pt, weak: true) + ["]
+  if it.attribution != none [ (#it.attribution)]
+}
 
 
 #let lang_data = read("lang.toml")
@@ -30,7 +30,7 @@
 	#link("https://github.com/jomaway/typst-linguify")[*linguify*] is a package for loading strings for different languages easily.
 
 	Version: #pkginfo.version \
-	Authors: #link("https://github.com/jomaway","jomaway") \
+	Authors: #link("https://github.com/jomaway","jomaway") + community contributions \
 	License: #pkginfo.license
 ]
 
@@ -53,7 +53,7 @@ This manual shows a short example for the usage of the `linguify` package inside
 
 *Example input:* \
 ```typc
-#set text(lang: <LANG-STRING>)
+#set text(lang: "LANG")
 #smallcaps(linguify("abstract"))
 === #linguify("title") 
 
@@ -89,7 +89,7 @@ Test: #linguify("test")
 
 )
 
-== Database<db>
+=== Database<db>
 The content of the `lang.toml` file, used in the example above looks like this.
 #raw(read("lang.toml"))
 
@@ -111,7 +111,62 @@ This makes sure the end user still can use the global database provided by #l wi
 
 #sym.arrow Have a look at the #link("https://github.com/jomaway/typst-gentle-clues", "gentle-clues") package for a real live example.
 
-== Contributing
+
+== Fluent support
+Thanks to #link("https://github.com/sjfhsjfh")[sjfhsjfh] we have fluent support.
+
+#_quote(title: none)[
+
+Fluent is #quote(attribution: link("https://projectfluent.org/")[Project Fluent])[a localization system
+for natural-sounding translations. ]
+]
+
+Heres a simple example of how to use the `linguify` package to load translations from fluent files, which are kept in `L10n` directory and named with the language code, e.g. `en.ftl` and `zh.ftl`.
+
+
+#grid(
+  columns: 2,
+  column-gutter: 1em,
+  [
+    ```typc
+    // my-document.typ
+    #import "@preview/linguify:0.4.0": *
+    // Define the languages you have files for.
+    #let languages = ("en", "zh")
+    #set_database(eval(load_ftl_data("./L10n", languages)))
+
+    // Use linguify like described above.
+    = #linguify("title")
+
+    #set text(lang: "zh")
+    = #linguify("title")
+
+    // Args are supported as well.
+    #linguify("hello", lang: "en", args: ("name": "Alice & Bob",))
+    ```
+  ],[
+    Folder structure
+    ```
+    my-project 
+    ├── L10n
+    │   ├── en.ftl
+    │   └── zh.ftl
+    │
+    └── my-document.typ
+    ```
+
+    Example for `en.ftl`
+    ```ftl
+    title = A linguify example - with Fluent
+    abstract = Abstract
+    hello = Hello, {$name}!
+    ```
+  ]
+)
+
+You have to maintain the language list used in database initialization since Typst currently does not list files in a directory. Of course, you can use an external YAML or JSON file to store the language list and load it in the script if it is necessary.
+
+= Contributing
 
 If you would like to integrate a new i18n solution into #l, you can set the `conf.data_type` described in the #ref(<db>, supplement: "database section"). And then add implementation in the `get-text` function for your data type.
 
@@ -119,7 +174,7 @@ If you would like to integrate a new i18n solution into #l, you can set the `con
 = Reference
 
 #import "@preview/tidy:0.2.0"
-#let docs = tidy.parse-module(read("../linguify.typ"), name: "Linguify reference")
+#let docs = tidy.parse-module(read("../lib/linguify.typ"), name: "Linguify reference")
 #tidy.show-module(docs, 
   style: tidy.styles.default,
   show-outline: false,
