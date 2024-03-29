@@ -4,12 +4,14 @@
 
 /// None or dictionary of the following structure:
 ///
-/// ```
-/// conf.default-lang: "en"
-/// lang.en:  *en-data*
-/// lang.de: *de-data*
-/// ```
-#let database = state("linguify-database", none);
+/// - `conf`
+///   - `data_type` (string): The type of data structure used for the database. If not specified, it defaults to `dict` structure.
+///   - `default-lang` (string): The default language to use as a fallback if the key in the preferred language is not found.
+///   - ...
+/// - `lang`
+///   - `en`: The English language section.
+///   - ...
+#let database = state("linguify-database", none)
 
 
 /// Set the default linguify database
@@ -62,7 +64,7 @@
 /// - src (dict): The dictionary to get the value from.
 /// - key (str): The key to get the value for.
 /// - lang (str): The language to get the value for.
-/// - mode (str): The data structure of src, currently only "dict" is supported.
+/// - mode (`dict` | `ftl`): The data structure of src
 /// -> The value for the key in the dictionary. If the key does not exist, `none` is returned.
 #let get_text(src, key, lang, mode: "dict", args: none) = {
   assert.eq(type(src), dictionary, message: "expected src to be a dictionary, found " + type(src))
@@ -72,8 +74,9 @@
       return lang_section.at(key, default: none)
     }
     else if mode == "ftl" {
-      return __get_message(lang_section, key, args: args)
+      return __get_message(lang_section, key, args: args, default: none)
     }
+    // Support for other i18n solutions can be added here.
   }
   return none
 }
