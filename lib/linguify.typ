@@ -89,10 +89,9 @@
 #let _linguify(key, from: auto, lang: auto, args: auto) = {
   let database = if-auto-then(from,database.get())
 
-  let data_type = database.conf.at("data_type", default: "dict")
-
   // check if database is not empty. Means no data dictionary was specified.
   if (database == none) { return error("linguify database is empty.") }
+  let data_type = database.conf.at("data_type", default: "dict")
 
   // get selected language.
   let selected_lang = if-auto-then(lang, text.lang)
