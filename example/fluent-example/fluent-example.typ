@@ -1,4 +1,3 @@
-#import "@local/linguify:0.4.0": *
 #import "lib.typ": *
 
 // Please compile this example in the root directory of the project
@@ -9,9 +8,9 @@ Heres a simple example of how to use the `linguify` package to load translations
 #v(1em)
 
 #code(```typ
-#import "../../linguify.typ": *
+#import "@preview/linguify:0.4.0": *
 #let languages = ("en", "zh")
-#set_database(eval(ftl_data("./L10n", languages)))
+#set_database(eval(load_ftl_data("./L10n", languages)))
 = #linguify("title")
 
 #set text(lang: "zh")

@@ -1,4 +1,4 @@
-#import "@local/linguify:0.4.0": *
+#import "@preview/linguify:0.4.0": *
 #import "@preview/gentle-clues:0.7.1": abstract
 
 #show raw.where(block: false): it => {
