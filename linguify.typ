@@ -64,7 +64,7 @@
 /// - src (dict): The dictionary to get the value from.
 /// - key (str): The key to get the value for.
 /// - lang (str): The language to get the value for.
-/// - mode (`dict` | `ftl`): The data structure of src
+/// - mode (str): The data structure of src
 /// -> The value for the key in the dictionary. If the key does not exist, `none` is returned.
 #let get_text(src, key, lang, mode: "dict", args: none) = {
   assert.eq(type(src), dictionary, message: "expected src to be a dictionary, found " + type(src))

@@ -1,4 +1,4 @@
-#import "@preview/linguify:0.4.0": *
+#import "@local/linguify:0.4.0": *
 #import "@preview/gentle-clues:0.7.1": abstract
 
 #show raw.where(block: false): it => {
@@ -110,6 +110,10 @@ Example:
 This makes sure the end user still can use the global database provided by #l with `set_database()` and calling. 
 
 #sym.arrow Have a look at the #link("https://github.com/jomaway/typst-gentle-clues", "gentle-clues") package for a real live example.
+
+== Contributing
+
+If you would like to integrate a new i18n solution into #l, you can set the `conf.data_type` described in the #ref(<db>, supplement: "database section"). And then add implementation in the `get-text` function for your data type.
 
 #pagebreak()
 = Reference
