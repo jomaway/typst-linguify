@@ -164,7 +164,50 @@ Heres a simple example of how to use the `linguify` package to load translations
   ]
 )
 
-You have to maintain the language list used in database initialization since Typst currently does not list files in a directory. Of course, you can use an external YAML or JSON file to store the language list and load it in the script if it is necessary.
+You have to maintain the language list used in database initialization since Typst currently does not list files in a directory. Of course, you can use an external file to store the language list and load it in the script if it is necessary.
+
+
+#grid(
+  columns: 2,
+  column-gutter: 1em,
+  [
+    Store config inside a `lang.toml` file.
+    ```toml
+    [conf]
+    default-lang = "en"
+    data-type = "ftl"
+
+    [ftl]
+    languages = ["en", "de"]
+    path = "./L10n"
+
+    [ftl.args]
+    name = "Lore"
+
+    [lang]
+    ```
+  ],
+  [
+    Load config inside your document.
+
+    ```typc
+    #let data = toml("lang.toml")
+
+    #for lang in data.ftl.languages {
+      let lang_section = read(data.ftl.path + "/" + lang + ".ftl")
+      data.lang.insert(lang, lang_section)
+    }
+
+    #set_database(data)
+    #linguify("hello")
+    ```
+    #sym.arrow prints #box(outset:(y: 4pt), inset:(x: 4pt), fill: orange.lighten(60%), radius: 3pt)[Hello, Lore!]
+  ]
+)
+
+
+
+
 
 = Contributing
 

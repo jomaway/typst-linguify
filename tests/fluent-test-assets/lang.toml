@@ -1,0 +1,12 @@
+[conf]
+default-lang = "en"
+data_type = "ftl"
+
+[ftl]
+languages = ["en", "de"]
+path = "./fluent-test-assets/L10n"
+
+[ftl.args]
+name = "Lore"
+
+[lang]

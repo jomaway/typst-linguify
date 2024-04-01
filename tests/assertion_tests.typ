@@ -1,4 +1,4 @@
-#import "@preview/linguify:0.4.0": *
+#import "../lib/linguify.typ": *
 
 #let db = toml("lang.toml")
 
@@ -137,6 +137,19 @@
   [run `test__linguify_auto_db` successfully]
 }
 
+#let test_args_in_dict_mode = {
+  context {
+    assert(_linguify("apple") ==  ok("Apple"))
+    assert(_linguify("apple", args:(name:"test")).error != none)
+    assert(_linguify("apple", args:none).error != none)
+    assert(_linguify("apple", args:(:)).error != none)
+    assert(_linguify("apple", args:"").error != none)
+    assert(_linguify("apple", args:1).error != none)
+  }
+
+  [run `test_args_in_dict_mode` successfully]
+}
+
 
 = Run tests (#datetime.today().display())
 
@@ -144,3 +157,4 @@
 - #test_get_text
 - #test__linguify
 - #test__linguify_auto_db
+- #test_args_in_dict_mode
