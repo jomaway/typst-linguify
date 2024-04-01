@@ -6,8 +6,8 @@
   assert(db != none)
   assert(db.at("lang", default: none) != none )
 
-  set_database(db)
-  reset_database()
+  set-database(db)
+  reset-database()
 
   [run `test_db` successfully]
 }
@@ -40,7 +40,7 @@
 
 
 #let test__linguify = {
-  reset_database()
+  reset-database()
 
   // English (en)
   set text(lang: "en")
@@ -90,7 +90,7 @@
 
 
 #let test__linguify_auto_db = {
-  set_database(db)
+  set-database(db)
     // English (en)
   set text(lang: "en")
   context {
