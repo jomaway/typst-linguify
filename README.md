@@ -1,8 +1,6 @@
 # Typst-linguify
 
-Load strings for different languages easily. This can be useful if you create a package or template for multilingual usage. See the [gentle-clues package](https://github.com/jomaway/typst-gentle-clues) as an example.
-
-⚠️ **Version 0.3.1 is not merged as official package yet.**
+Load strings for different languages easily. This can be useful if you create a package or template for multilingual usage. 
 
 ## Usage
 
@@ -14,7 +12,7 @@ You can use linguify global database.
 
 Example:
 ```typst
-#import "@preview/linguify:0.3.1": *
+#import "@preview/linguify:0.4.0": *
 
 #let lang_data = toml("lang.toml")
 #linguify_set_database(lang_data);
@@ -46,7 +44,7 @@ Recommend is to store the database in a separate file like `lang.toml` and load 
 
 Example: 
 ```typ
-#import "@preview/linguify:0.3.1": *
+#import "@preview/linguify:0.4.0": *
 
 #let database = toml("lang.toml")
 
@@ -55,6 +53,7 @@ Example:
 
 ## Features
 
-- Use a `toml` or other file to load strings for different languages. You need to pass a typst dictionary whichs follows the structure of the shown toml file.
+- Use a `toml` or other file to load strings for different languages. You need to pass a typst dictionary which follows the structure of the shown toml file.
 - Specify a **default-lang**. If none is specified it will default to `en`
 - **Fallback** to the default-lang if a key is not found for a certain language.
+- [Fluent](https://projectfluent.org) support 

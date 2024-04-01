@@ -13,4 +13,4 @@ clean-tests:
 	rm -r tests/results
 
 build-docs:
-	typst compile docs/docs.typ --root ..
+	typst compile docs/docs.typ manual.pdf --root ..
