@@ -19,7 +19,7 @@
 
 #let lang_data = read("lang.toml")
 
-#set_database(toml("lang.toml")) 
+#set-database(toml("lang.toml")) 
 
 #let pkginfo = toml("../typst.toml").package
 
@@ -48,7 +48,7 @@ This manual shows a short example for the usage of the `linguify` package inside
 *Load language data file:*  #sym.arrow See #ref(<db>, supplement: "database section") for content of `lang.toml`
 
 ```typc
-#set_database(toml("lang.toml")) 
+#set-database(toml("lang.toml")) 
 ```
 
 *Example input:* \
