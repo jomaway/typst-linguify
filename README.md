@@ -15,7 +15,7 @@ Example:
 #import "@preview/linguify:0.4.0": *
 
 #let lang_data = toml("lang.toml")
-#linguify_set_database(lang_data);
+#set-database(lang_data);
 
 #set text(lang: "de")
 
@@ -25,6 +25,7 @@ Example:
 The `lang.toml` musst look like this:
 
 ```toml
+[conf]
 default-lang = "en"
 
 [en]
