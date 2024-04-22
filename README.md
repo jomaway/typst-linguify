@@ -28,11 +28,11 @@ The `lang.toml` musst look like this:
 [conf]
 default-lang = "en"
 
-[en]
+[lang.en]
 title = "A simple linguify example"
 abstract = "Abstract"
 
-[de]
+[lang.de]
 title = "Ein einfaches Linguify Beispiel"
 abstract = "Zusammenfassung"
 ```
